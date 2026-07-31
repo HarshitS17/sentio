@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: sentio
+
+  devtools:
+    restart:
+      enabled: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: sentio-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+app:
+  tickers:
+    - AAPL
+    - TSLA
+    - NVDA
+    - MSFT
+  rss-feeds:
+    - https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL&region=US&lang=en-US
+    - https://feeds.finance.yahoo.com/rss/2.0/headline?s=TSLA&region=US&lang=en-US
+    - https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA&region=US&lang=en-US
+    - https://feeds.finance.yahoo.com/rss/2.0/headline?s=MSFT&region=US&lang=en-US
+  scrape-interval-seconds: 30
+  price-poll-interval-seconds: 60

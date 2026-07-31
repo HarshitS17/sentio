@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentio — Sense the market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #0B0E11;
+      --panel: #14181D;
+      --panel-raised: #1B2027;
+      --hairline: #262C34;
+      --paper: #E8E6DE;
+      --paper-dim: #8B9098;
+      --signal-up: #4FBA6F;
+      --signal-down: #C0432E;
+      --signal-flat: #C9A227;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'IBM Plex Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--font-body);
+      height: 100%;
+    }
+
+    a, button { font-family: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--signal-flat);
+      outline-offset: 2px;
+    }
+
+    /* ── Header + ticker tape (signature element) ─────────────────────── */
+
+    header.masthead {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--hairline);
+      background: var(--panel);
+    }
+
+    .wordmark {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .wordmark span {
+      color: var(--paper-dim);
+      font-weight: 500;
+      font-size: 12px;
+      display: block;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .tape-viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      mask-image: linear-gradient(90deg, transparent, black 24px, black calc(100% - 24px), transparent);
+    }
+
+    .tape-track {
+      display: flex;
+      width: max-content;
+      animation: scroll-tape 28s linear infinite;
+    }
+
+    @keyframes scroll-tape {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tape-track { animation: none; }
+      .tape-viewport { overflow-x: auto; }
+    }
+
+    .tape-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 0 22px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      white-space: nowrap;
+      border-right: 1px solid var(--hairline);
+    }
+
+    .tape-item .sym { font-weight: 600; color: var(--paper); }
+    .tape-item .px { color: var(--paper-dim); }
+    .tape-item .arrow.up { color: var(--signal-up); }
+    .tape-item .arrow.down { color: var(--signal-down); }
+    .tape-item .arrow.flat { color: var(--signal-flat); }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--paper-dim);
+      white-space: nowrap;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--signal-flat);
+    }
+
+    .live-dot.connected { background: var(--signal-up); box-shadow: 0 0 0 3px rgba(79,186,111,0.18); }
+    .live-dot.error { background: var(--signal-down); box-shadow: 0 0 0 3px rgba(192,67,46,0.18); }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 61px);
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Ticker rail ────────────────────────────────────────────────────── */
+
+    nav.rail {
+      border-right: 1px solid var(--hairline);
+      padding: 18px 10px;
+    }
+
+    @media (max-width: 760px) {
+      nav.rail {
+        border-right: none;
+        border-bottom: 1px solid var(--hairline);
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 12px 14px;
+      }
+    }
+
+    .rail-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--paper-dim);
+      text-transform: uppercase;
+      padding: 0 10px 10px;
+    }
+
+    @media (max-width: 760px) { .rail-label { display: none; } }
+
+    .rail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--paper);
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+      font-family: var(--font-mono);
+    }
+
+    .rail-item:hover { background: var(--panel-raised); }
+    .rail-item.active { background: var(--panel-raised); box-shadow: inset 3px 0 0 var(--signal-flat); }
+
+    .rail-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .rail-dot.positive { background: var(--signal-up); }
+    .rail-dot.negative { background: var(--signal-down); }
+    .rail-dot.neutral { background: var(--signal-flat); }
+
+    /* ── Detail pane ────────────────────────────────────────────────────── */
+
+    main.detail { padding: 28px 32px 40px; }
+
+    .detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .detail-symbol {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 40px;
+      letter-spacing: 0.01em;
+    }
+
+    .detail-price {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--paper-dim);
+      margin-top: 4px;
+    }
+
+    .score-block { text-align: right; }
+
+    .score-value {
+      font-family: var(--font-mono);
+      font-size: 34px;
+      font-weight: 600;
+    }
+
+    .score-value.positive { color: var(--signal-up); }
+    .score-value.negative { color: var(--signal-down); }
+    .score-value.neutral { color: var(--signal-flat); }
+
+    .trend-chip {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .trend-chip.positive { background: rgba(79,186,111,0.14); color: var(--signal-up); }
+    .trend-chip.negative { background: rgba(192,67,46,0.14); color: var(--signal-down); }
+    .trend-chip.neutral { background: rgba(201,162,39,0.14); color: var(--signal-flat); }
+
+    .sample-note {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--paper-dim);
+      margin-top: 4px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper-dim);
+      margin: 0 0 14px;
+    }
+
+    .chart-wrap { height: 200px; }
+
+    /* ── Headline feed ──────────────────────────────────────────────────── */
+
+    .feed-row {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .feed-row:last-child { border-bottom: none; }
+
+    .feed-time {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--paper-dim);
+      flex-shrink: 0;
+      width: 64px;
+    }
+
+    .feed-chip {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+    }
+
+    .feed-chip.positive { background: var(--signal-up); }
+    .feed-chip.negative { background: var(--signal-down); }
+    .feed-chip.neutral { background: var(--signal-flat); }
+
+    .feed-headline { font-size: 14px; line-height: 1.4; }
+
+    .empty-state {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--paper-dim);
+      padding: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Sentio<span>Sense the market</span></div>
+  <div class="tape-viewport">
+    <div class="tape-track" id="tapeTrack"></div>
+  </div>
+  <div class="live-badge">
+    <span class="live-dot" id="liveDot"></span>
+    <span id="liveLabel">CONNECTING</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="rail">
+    <div class="rail-label">Tickers</div>
+    <div id="railList"></div>
+  </nav>
+
+  <main class="detail">
+    <div class="detail-head">
+      <div>
+        <div class="detail-symbol" id="detailSymbol">—</div>
+        <div class="detail-price" id="detailPrice">Loading price…</div>
+      </div>
+      <div class="score-block">
+        <div class="score-value neutral" id="scoreValue">—</div>
+        <div class="trend-chip neutral" id="trendChip">—</div>
+        <div class="sample-note" id="sampleNote"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Sentiment timeline</p>
+      <div class="chart-wrap"><canvas id="sentimentChart"></canvas></div>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Headline feed</p>
+      <div id="feedList"><div class="empty-state">Waiting for headlines…</div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const API = {
+      summary: '/api/sentiment/summary',
+      snapshot: (t) => `/api/sentiment/snapshot/${t}`,
+      stream: (t) => `/api/sentiment/stream/${t}`,
+      priceFull: (t) => `/api/price/full/${t}`
+    };
+
+    const state = {
+      tickers: [],       // [{ticker, trend}]
+      current: null,
+      eventSource: null,
+      chart: null
+    };
+
+    const railList = document.getElementById('railList');
+    const tapeTrack = document.getElementById('tapeTrack');
+    const liveDot = document.getElementById('liveDot');
+    const liveLabel = document.getElementById('liveLabel');
+    const detailSymbol = document.getElementById('detailSymbol');
+    const detailPrice = document.getElementById('detailPrice');
+    const scoreValue = document.getElementById('scoreValue');
+    const trendChip = document.getElementById('trendChip');
+    const sampleNote = document.getElementById('sampleNote');
+    const feedList = document.getElementById('feedList');
+
+    function trendClass(trend) {
+      if (trend === 'POSITIVE') return 'positive';
+      if (trend === 'NEGATIVE') return 'negative';
+      return 'neutral';
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '--:--:--';
+      const d = new Date(iso);
+      return d.toLocaleTimeString('en-US', { hour12: false });
+    }
+
+    function fmtPrice(tick) {
+      if (!tick) return 'Price unavailable';
+      const pct = tick.regularMarketChangePercent;
+      const arrow = pct > 0 ? '▲' : pct < 0 ? '▼' : '●';
+      const sign = pct > 0 ? '+' : '';
+      return `$${tick.regularMarketPrice.toFixed(2)}  ${arrow} ${sign}${pct.toFixed(2)}%`;
+    }
+
+    // ── Ticker rail + tape ────────────────────────────────────────────────
+
+    function renderRail() {
+      railList.innerHTML = '';
+      state.tickers.forEach(({ ticker, trend }) => {
+        const btn = document.createElement('button');
+        btn.className = 'rail-item' + (ticker === state.current ? ' active' : '');
+        btn.setAttribute('aria-pressed', ticker === state.current);
+        btn.innerHTML = `<span class="rail-dot ${trendClass(trend)}"></span>${ticker}`;
+        btn.addEventListener('click', () => selectTicker(ticker));
+        railList.appendChild(btn);
+      });
+    }
+
+    function renderTape(items) {
+      // items: [{ticker, price, trend}]
+      const build = () => items.map(({ ticker, price, trend }) => {
+        const pct = price ? price.regularMarketChangePercent : 0;
+        const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat';
+        const arrow = pct > 0 ? '▲' : pct < 0 ? '▼' : '●';
+        const priceStr = price ? `$${price.regularMarketPrice.toFixed(2)}` : '—';
+        return `<span class="tape-item"><span class="sym">${ticker}</span><span class="px">${priceStr}</span><span class="arrow ${dir}">${arrow}</span></span>`;
+      }).join('');
+      // duplicate content once so the CSS marquee (translateX -50%) loops seamlessly
+      tapeTrack.innerHTML = build() + build();
+    }
+
+    // ── Connection status ────────────────────────────────────────────────
+
+    function setLiveState(mode) {
+      liveDot.className = 'live-dot' + (mode === 'connected' ? ' connected' : mode === 'error' ? ' error' : '');
+      liveLabel.textContent = mode === 'connected' ? 'LIVE' : mode === 'error' ? 'RECONNECTING' : 'CONNECTING';
+    }
+
+    // ── Chart ─────────────────────────────────────────────────────────────
+
+    function pointColor(label) {
+      if (label === 'POSITIVE') return '#4FBA6F';
+      if (label === 'NEGATIVE') return '#C0432E';
+      return '#C9A227';
+    }
+
+    function ensureChart() {
+      if (state.chart) return state.chart;
+      const ctx = document.getElementById('sentimentChart').getContext('2d');
+      state.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            borderColor: '#8B9098',
+            borderWidth: 1.5,
+            pointRadius: 4,
+            pointBackgroundColor: [],
+            tension: 0.25,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#8B9098', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#262C34' } },
+            y: { min: -1, max: 1, ticks: { color: '#8B9098', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#262C34' } }
+          }
+        }
+      });
+      return state.chart;
+    }
+
+    function updateChart(headlines) {
+      const chart = ensureChart();
+      // recentHeadlines arrive newest-first — reverse for a left-to-right timeline
+      const ordered = [...headlines].reverse();
+      chart.data.labels = ordered.map(h => fmtTime(h.timestamp));
+      chart.data.datasets[0].data = ordered.map(h => h.compound);
+      chart.data.datasets[0].pointBackgroundColor = ordered.map(h => pointColor(h.label));
+      chart.update();
+    }
+
+    function updateFeed(headlines) {
+      if (!headlines || headlines.length === 0) {
+        feedList.innerHTML = '<div class="empty-state">No headlines scored for this ticker yet.</div>';
+        return;
+      }
+      feedList.innerHTML = headlines.map(h => `
+      <div class="feed-row">
+        <span class="feed-time">${fmtTime(h.timestamp)}</span>
+        <span class="feed-chip ${trendClass(h.label)}"></span>
+        <span class="feed-headline">${escapeHtml(h.headline)}</span>
+      </div>
+    `).join('');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Detail rendering ──────────────────────────────────────────────────
+
+    function renderSnapshot(snapshot) {
+      if (!snapshot) return;
+      const cls = trendClass(snapshot.trend);
+      scoreValue.textContent = snapshot.rollingAverage.toFixed(4);
+      scoreValue.className = 'score-value ' + cls;
+      trendChip.textContent = snapshot.trend;
+      trendChip.className = 'trend-chip ' + cls;
+      sampleNote.textContent = `${snapshot.sampleCount} samples · updated ${fmtTime(snapshot.generatedAt)}`;
+      updateChart(snapshot.recentHeadlines || []);
+      updateFeed(snapshot.recentHeadlines || []);
+
+      const t = state.tickers.find(x => x.ticker === snapshot.ticker);
+      if (t) { t.trend = snapshot.trend; renderRail(); }
+    }
+
+    // ── Ticker selection ──────────────────────────────────────────────────
+
+    function selectTicker(ticker) {
+      if (state.current === ticker) return;
+      state.current = ticker;
+      detailSymbol.textContent = ticker;
+      renderRail();
+
+      if (state.eventSource) {
+        state.eventSource.close();
+      }
+
+      // Instant paint from a one-shot fetch, before the SSE stream takes over.
+      fetch(API.priceFull(ticker))
+              .then(r => r.json())
+              .then(full => {
+                detailPrice.textContent = fmtPrice(full.price);
+                if (full.sentiment) renderSnapshot(full.sentiment);
+                else feedList.innerHTML = '<div class="empty-state">No sentiment data for this ticker yet.</div>';
+              })
+              .catch(() => { detailPrice.textContent = 'Price unavailable'; });
+
+      setLiveState('connecting');
+      const es = new EventSource(API.stream(ticker));
+      state.eventSource = es;
+
+      es.addEventListener('sentiment-update', (e) => {
+        setLiveState('connected');
+        renderSnapshot(JSON.parse(e.data));
+      });
+      es.onopen = () => setLiveState('connected');
+      es.onerror = () => setLiveState('error'); // EventSource auto-reconnects on its own
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────
+
+    function refreshTape() {
+      Promise.all(state.tickers.map(({ ticker }) =>
+              fetch(API.priceFull(ticker)).then(r => r.json()).catch(() => ({ ticker, price: null, sentiment: null }))
+      )).then(results => {
+        renderTape(results.map(r => ({ ticker: r.ticker, price: r.price, trend: r.sentiment ? r.sentiment.trend : 'NEUTRAL' })));
+      });
+    }
+
+    fetch(API.summary)
+            .then(r => r.json())
+            .then(snapshots => {
+              state.tickers = snapshots.map(s => ({ ticker: s.ticker, trend: s.trend }));
+              if (state.tickers.length === 0) {
+                railList.innerHTML = '<div class="empty-state">No tickers reporting yet.</div>';
+                return;
+              }
+              renderRail();
+              refreshTape();
+              setInterval(refreshTape, 60000);
+              selectTicker(state.tickers[0].ticker);
+            })
+            .catch(() => {
+              railList.innerHTML = '<div class="empty-state">Could not reach Sentio backend.</div>';
+            });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on: [zookeeper]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # TWO listeners:
+      # PLAINTEXT_INTERNAL → used by other Docker containers (e.g. future microservices)
+      # PLAINTEXT_HOST     → used by your Spring Boot app running on the host machine
+      KAFKA_LISTENERS: PLAINTEXT_INTERNAL://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+
+      # This is what Kafka tells clients to reconnect to after the handshake.
+      # PLAINTEXT_HOST uses localhost:9092 — correct for your Mac host machine.
+      # This was the bug: before, Kafka was advertising an address unreachable from host.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_INTERNAL://kafka:29092,PLAINTEXT_HOST://localhost:9092
+
+      # Maps listener names to security protocols
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_INTERNAL:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+      # Kafka brokers talk to each other on the internal listener
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

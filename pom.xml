@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.6</version>
+        <relativePath/>
+    </parent>
+    <groupId>com.sentio</groupId>
+    <artifactId>sentio</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>sentio</name>
+    <description>sentio</description>
+    <url/>
+    <licenses><license/></licenses>
+    <developers><developer/></developers>
+    <scm>
+        <connection/><developerConnection/><tag/><url/>
+    </scm>
+
+    <properties>
+        <java.version>17</java.version>
+        <!--
+            Spring Boot 4.x ships Jackson 3.x (tools.jackson) as its default JSON library.
+            We pin jackson-databind 2.x explicitly so that:
+              - com.fasterxml.jackson.databind.JsonNode resolves in YahooPricePoller
+              - RedisConfig's Jackson2JsonRedisSerializer resolves
+              - WebClient's bodyToMono(JsonNode.class) works
+            Jackson 2.x and 3.x can coexist on the classpath — Spring's auto-config
+            will use whichever ObjectMapper bean is primary.
+        -->
+        <jackson.version>2.18.2</jackson.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- ── SPRING BOOT STARTERS ───────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <!-- WebFlux = reactive web layer + WebClient + Netty server -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka</artifactId>
+            <!-- KafkaTemplate, KafkaAdmin, topic auto-creation -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+            <!-- ReactiveRedisTemplate, Lettuce async client -->
+        </dependency>
+
+        <!-- ── JACKSON 2.x (explicit) ────────────────────────────────────── -->
+        <!--
+            Spring Boot 4.x defaults to Jackson 3 (tools.jackson.*).
+            We add Jackson 2.x explicitly because:
+              1. com.fasterxml.jackson.databind.JsonNode — used in YahooPricePoller
+              2. Jackson2JsonRedisSerializer              — used in RedisConfig
+              3. WebClient bodyToMono(JsonNode.class)    — needs com.fasterxml on classpath
+        -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+            <!-- Needed to serialize/deserialize java.time.Instant in PriceTick -->
+        </dependency>
+
+        <!-- ── ROME RSS PARSER ───────────────────────────────────────────── -->
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+            <version>2.1.0</version>
+            <!-- Parses Yahoo Finance RSS/Atom feeds into SyndFeed objects -->
+        </dependency>
+
+        <!-- ── REACTOR KAFKA ─────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>io.projectreactor.kafka</groupId>
+            <artifactId>reactor-kafka</artifactId>
+            <version>1.3.25</version>
+            <!-- KafkaReceiver — reactive (non-blocking) Kafka consumer -->
+        </dependency>
+
+        <!-- ── VADER SENTIMENT (JitPack) ─────────────────────────────────── -->
+        <dependency>
+            <groupId>com.github.apanimesh061</groupId>
+            <artifactId>VaderSentimentJava</artifactId>
+            <version>1.1.1</version>
+            <!-- Pure-Java VADER implementation — no API key, runs on JVM -->
+        </dependency>
+
+        <!-- ── DEV TOOLS + LOMBOK ────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ── TEST ──────────────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <!--
+                Correct artifact name — replaces the non-existent
+                "spring-boot-starter-webflux-test" from the original pom.
+                Includes JUnit 5, Mockito, AssertJ, WebTestClient.
+            -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+            <!--
+                Correct artifact name — replaces the non-existent
+                "spring-boot-starter-kafka-test" from the original pom.
+                Provides EmbeddedKafkaBroker for integration tests.
+            -->
+        </dependency>
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+            <!-- Required for VaderSentimentJava which is not on Maven Central -->
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals><goal>compile</goal></goals>
+                        <configuration>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals><goal>testCompile</goal></goals>
+                        <configuration>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
