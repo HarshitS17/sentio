@@ -1,0 +1,106 @@
+name: Sentio UI — CI Pipeline
+
+# ┌─────────────────────────────────────────────────────────────────┐
+# │  TRIGGER: When does this pipeline run?                          │
+# │                                                                 │
+# │  • On every push to the "main" branch                          │
+# │  • On every pull request targeting the "main" branch            │
+# │  • Only when files inside sentio-ui/ are changed                │
+# │    (no point running frontend CI if only Java backend changed)  │
+# └─────────────────────────────────────────────────────────────────┘
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sentio-ui/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'sentio-ui/**'
+
+# ┌─────────────────────────────────────────────────────────────────┐
+# │  JOBS: What work should be done?                                │
+# │                                                                 │
+# │  A "job" is an independent unit of work that runs on a fresh    │
+# │  virtual machine (called a "runner"). You can have multiple     │
+# │  jobs that run in parallel or sequentially.                     │
+# └─────────────────────────────────────────────────────────────────┘
+jobs:
+
+  # ════════════════════════════════════════════════════════════════
+  # JOB 1: Lint & Type Check
+  # ════════════════════════════════════════════════════════════════
+  lint-and-typecheck:
+    name: 🔍 Lint & Type Check
+    runs-on: ubuntu-latest    # Use a free Linux runner from GitHub
+
+    # ┌───────────────────────────────────────────────────────────┐
+    # │  STEPS: The sequential tasks inside this job              │
+    # │                                                           │
+    # │  Each step is one command or action. They run in order.   │
+    # │  If any step fails, the whole job fails and the pipeline  │
+    # │  is marked as ❌ — blocking the PR from being merged.     │
+    # └───────────────────────────────────────────────────────────┘
+    steps:
+      # Step 1: Download your code onto the runner
+      # Without this, the runner is an empty machine with no code!
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js on the runner
+      # We pin a specific version so builds are reproducible
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'                          # Cache node_modules between runs
+          cache-dependency-path: sentio-ui/package-lock.json
+
+      # Step 3: Install dependencies (npm ci is faster & stricter than npm install)
+      # "ci" = Clean Install — uses exact versions from package-lock.json
+      - name: 📦 Install dependencies
+        working-directory: sentio-ui
+        run: npm ci
+
+      # Step 4: Run ESLint to check for code quality issues
+      # This catches things like unused variables, missing imports, etc.
+      - name: 🧹 Run ESLint
+        working-directory: sentio-ui
+        run: npx next lint
+
+      # Step 5: Run TypeScript compiler to check for type errors
+      # This is what caught the GaugeChart "value vs score" bug!
+      - name: 🔎 TypeScript type check
+        working-directory: sentio-ui
+        run: npx tsc --noEmit
+
+  # ════════════════════════════════════════════════════════════════
+  # JOB 2: Build
+  # Runs AFTER lint-and-typecheck passes (see "needs" below)
+  # ════════════════════════════════════════════════════════════════
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck   # ← This job waits for Job 1 to pass first
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: sentio-ui/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: sentio-ui
+        run: npm ci
+
+      # Step 4: Run the full production build
+      # This compiles all pages, optimizes assets, and generates the output
+      # If this fails, the code is not deployable!
+      - name: 🔨 Build production bundle
+        working-directory: sentio-ui
+        run: npm run build
