@@ -66,7 +66,7 @@ jobs:
       # This catches things like unused variables, missing imports, etc.
       - name: 🧹 Run ESLint
         working-directory: sentio-ui
-        run: npx next lint
+        run: npm run lint
 
       # Step 5: Run TypeScript compiler to check for type errors
       # This is what caught the GaugeChart "value vs score" bug!
