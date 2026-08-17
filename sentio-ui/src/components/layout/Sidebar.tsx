@@ -125,7 +125,15 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                 </motion.div>
               )}
             </AnimatePresence>
-            {!collapsed && <LogOut size={16} className="text-slate-300 group-hover:text-white transition-colors" />}
+            {!collapsed && (
+              <button
+                onClick={() => window.location.href = '/login'}
+                className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+                title="Sign Out"
+              >
+                <LogOut size={16} className="text-slate-300 group-hover:text-white transition-colors" />
+              </button>
+            )}
           </div>
         </div>
       </div>

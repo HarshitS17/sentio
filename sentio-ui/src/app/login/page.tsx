@@ -1,14 +1,21 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Activity, Code, Mail, Lock } from 'lucide-react';
+import { useSpiralAnimation } from '@/hooks/use-spiral-animation';
 
 export default function LoginPage() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+
+  useSpiralAnimation(canvasRef, leftPanelRef);
+
   return (
     <div className="min-h-screen bg-[#070B14] text-white flex overflow-hidden">
       {/* Left Side - Brand Showcase */}
-      <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 border-r border-white/10 overflow-hidden">
+      <div ref={leftPanelRef} className="left-panel hidden lg:flex flex-1 relative flex-col justify-between p-12 border-r border-white/10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-[#070B14] to-[#101826] z-0"></div>
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 z-0"></div>
         
@@ -16,12 +23,28 @@ export default function LoginPage() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse z-0"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse delay-1000 z-0"></div>
 
-        <div className="relative z-10 flex items-center gap-2">
+        {/* Spiral Animation Canvas */}
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '52%',
+            transform: 'translate(-50%, -50%)',
+            width: '700px',
+            height: '700px',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+        {/* Vignette is applied via .left-panel::after in CSS */}
+
+        <div className="relative z-10 flex items-center gap-2" style={{ zIndex: 2 }}>
           <Activity className="w-8 h-8 text-blue-500" />
           <span className="text-2xl font-bold tracking-tight">Sentio</span>
         </div>
 
-        <div className="relative z-10 max-w-lg">
+        <div className="relative z-10 max-w-lg" style={{ zIndex: 2 }}>
           <h2 className="text-4xl font-bold mb-6">Gain an edge with real-time market sentiment.</h2>
           <p className="text-slate-400 text-lg leading-relaxed mb-8">
             Access institutional-grade analytics, stream thousands of financial events per second, and make data-driven decisions powered by advanced NLP.
@@ -40,7 +63,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="relative z-10 text-sm text-slate-500">
+        <div className="relative z-10 text-sm text-slate-500" style={{ zIndex: 2 }}>
           © {new Date().getFullYear()} Sentio. Enterprise Security Applied.
         </div>
       </div>

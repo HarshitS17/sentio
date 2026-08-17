@@ -93,7 +93,7 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
           >
             <h2 className="text-lg font-semibold text-white mb-4">Sentiment Gauge</h2>
             <div className="flex justify-center">
-              <GaugeChart value={currentSentiment} size={280} />
+              <GaugeChart score={currentSentiment} />
             </div>
           </motion.div>
 

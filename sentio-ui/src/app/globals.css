@@ -179,3 +179,18 @@ body {
 .animate-ticker {
   animation: ticker-scroll 30s linear infinite;
 }
+
+/* Login Spiral Vignette */
+.left-panel {
+  position: relative;
+}
+
+.left-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 58% 58% at 52% 50%, transparent 25%, #0D1117 78%);
+  z-index: 1;
+  pointer-events: none;
+}
+
