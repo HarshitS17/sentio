@@ -151,7 +151,7 @@ export default function LoginPage() {
           </div>
           
           <p className="text-center mt-8 text-sm text-slate-500">
-            Don't have an account? <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">Request Access</a>
+            Don&apos;t have an account? <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">Request Access</a>
           </p>
         </motion.div>
       </div>

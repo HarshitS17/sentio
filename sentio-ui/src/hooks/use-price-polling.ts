@@ -39,7 +39,9 @@ export function usePricePolling(ticker: string | null, intervalMs = 30000) {
       // Setup interval
       intervalRef.current = setInterval(pollPrice, intervalMs);
     } else {
-      setPrice(null);
+      setTimeout(() => {
+        if (isMounted) setPrice(null);
+      }, 0);
     }
 
     return () => {

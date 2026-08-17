@@ -13,7 +13,10 @@ export default function NewsPage() {
   const [sentimentFilter, setSentimentFilter] = useState('ALL');
   const [search, setSearch] = useState('');
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const allNews = useMemo(() => {
     const news = TICKERS.flatMap(t => generateMockNewsForTicker(t, 6));

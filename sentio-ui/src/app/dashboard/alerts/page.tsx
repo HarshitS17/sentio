@@ -25,7 +25,10 @@ const DEFAULT_RULES: AlertRule[] = [
 export default function AlertsPage() {
   const [mounted, setMounted] = useState(false);
   const [rules, setRules] = useState<AlertRule[]>(DEFAULT_RULES);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const recentAlerts = generateMockAlerts();
 

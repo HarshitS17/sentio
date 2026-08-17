@@ -7,7 +7,10 @@ import { FileText, Download, Calendar, ChevronRight, FileBarChart, Filter } from
 
 export default function ReportsPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const reports = generateMockReports();
 

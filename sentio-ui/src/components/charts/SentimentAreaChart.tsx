@@ -27,12 +27,22 @@ interface SentimentAreaChartProps {
   className?: string;
 }
 
-const GlassTooltip = ({ active, payload, label }: any) => {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number | string;
+    color: string;
+  }>;
+  label?: string;
+}
+
+const GlassTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#101826]/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-xl">
         <p className="text-white font-medium mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index: number) => (
           <div key={`item-${index}`} className="flex items-center gap-2 mb-1 last:mb-0">
             <div 
               className="w-3 h-3 rounded-full" 

@@ -10,7 +10,10 @@ const PIE_COLORS = ['#22C55E', '#EF4444', '#F59E0B'];
 
 export default function AnalyticsPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const sectorData = generateMockSectorData();
   const chartData = generateMockDashboardChartData();

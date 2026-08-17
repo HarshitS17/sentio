@@ -14,7 +14,10 @@ const TABS = [
 export default function SettingsPage() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   if (!mounted) return <div className="p-8 text-[#94A3B8]">Loading settings...</div>;
 

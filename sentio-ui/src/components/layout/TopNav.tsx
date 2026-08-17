@@ -8,14 +8,17 @@ interface TopNavProps {
   collapsed?: boolean;
 }
 
-export default function TopNav({ collapsed }: TopNavProps) {
+export default function TopNav({  }: TopNavProps) {
   const { open } = useCommandPalette();
   const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
-    setTime(new Date());
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const initTimer = setTimeout(() => setTime(new Date()), 0);
+    const intervalTimer = setInterval(() => setTime(new Date()), 1000);
+    return () => {
+      clearTimeout(initTimer);
+      clearInterval(intervalTimer);
+    };
   }, []);
 
   return (

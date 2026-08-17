@@ -13,12 +13,15 @@ export default function StocksPage() {
   const [sectorFilter, setSectorFilter] = useState('All');
   const [sortBy, setSortBy] = useState<'ticker' | 'sentiment' | 'change'>('ticker');
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const stocks = useMemo(() => generateMockStockData(), []);
 
   const filteredStocks = useMemo(() => {
-    let result = stocks.filter(s =>
+    const result = stocks.filter(s =>
       (s.ticker.includes(search.toUpperCase()) || s.name.toLowerCase().includes(search.toLowerCase())) &&
       (sectorFilter === 'All' || s.sector === sectorFilter)
     );

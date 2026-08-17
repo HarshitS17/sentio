@@ -21,7 +21,10 @@ const STATUS_ITEMS = [
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const kpi = generateMockKPIData();
   const chartData = generateMockDashboardChartData();

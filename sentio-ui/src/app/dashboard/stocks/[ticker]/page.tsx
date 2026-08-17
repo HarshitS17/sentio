@@ -21,7 +21,10 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
   const [mounted, setMounted] = useState(false);
   const { data: liveData, isConnected } = useSentimentStream(ticker);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const info = TICKER_INFO[ticker] || { name: ticker, color: '#3B82F6', sector: 'Unknown', marketCap: 'N/A' };
   const stockData = useMemo(() => generateMockStockData().find(s => s.ticker === ticker), [ticker]);

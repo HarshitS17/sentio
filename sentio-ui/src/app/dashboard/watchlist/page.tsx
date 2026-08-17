@@ -17,15 +17,23 @@ export default function WatchlistPage() {
   const [showAdd, setShowAdd] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setWatchlist(JSON.parse(saved));
-    } else {
-      const defaults = ['AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN'];
-      setWatchlist(defaults);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-    }
+    let active = true;
+    const t = setTimeout(() => {
+      if (!active) return;
+      setMounted(true);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setWatchlist(JSON.parse(saved));
+      } else {
+        const defaults = ['AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN'];
+        setWatchlist(defaults);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
   }, []);
 
   const stocks = useMemo(() => generateMockStockData(), []);

@@ -66,7 +66,7 @@ export function ChartSkeleton() {
           <Skeleton 
             key={i} 
             className="w-full rounded-t-sm" 
-            style={{ height: `${Math.max(20, Math.random() * 100)}%` }} 
+            style={{ height: `${20 + ((i * 37) % 80)}%` }} 
           />
         ))}
       </div>
