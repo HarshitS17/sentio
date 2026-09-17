@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentio — Project Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --accent: #00ff87;
+    --accent2: #7c6dfa;
+    --accent3: #ff6b6b;
+    --accent4: #ffd93d;
+    --accent5: #4ecdc4;
+    --mono: 'JetBrains Mono', monospace;
+    --head: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,135,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(124,109,250,0.06) 0%, transparent 70%);
+    top: 30%; left: 20%;
+    pointer-events: none;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,135,0.08);
+    border: 1px solid rgba(0,255,135,0.2);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: var(--head);
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 3rem;
+    font-weight: 300;
+  }
+
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.1em;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── MAIN CONTENT ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 5rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section h2 {
+    font-family: var(--head);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .section p {
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 680px;
+    margin-bottom: 1rem;
+  }
+
+  .section p strong { color: var(--text); font-weight: 500; }
+
+  /* ── ANALOGY CARD ── */
+  .analogy {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--accent4);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.05rem;
+  }
+
+  .analogy::before {
+    content: '💡 Think of it like this:';
+    display: block;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent4);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── PIPELINE FLOW ── */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 2.5rem 0;
+  }
+
+  .pipe-step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 0 1.5rem;
+    position: relative;
+  }
+
+  .pipe-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pipe-dot {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .pipe-connector {
+    width: 2px;
+    flex: 1;
+    min-height: 24px;
+    background: linear-gradient(to bottom, var(--border2), transparent);
+    margin: 4px 0;
+  }
+
+  .pipe-content {
+    padding: 0 0 2.5rem 0;
+  }
+
+  .pipe-content h3 {
+    font-family: var(--head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 10px;
+  }
+
+  .pipe-content p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .pipe-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TECH TABLE ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .tech-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .tech-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+
+  .tech-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+  }
+
+  .tech-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .tech-card h4 {
+    font-family: var(--head);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .tech-card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .phase {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .phase:hover { border-color: var(--border2); }
+
+  .phase-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .phase-title {
+    font-family: var(--head);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .phase-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.05em;
+  }
+
+  .status-done { background: rgba(0,255,135,0.1); color: var(--accent); border: 1px solid rgba(0,255,135,0.2); }
+  .status-next { background: rgba(124,109,250,0.1); color: var(--accent2); border: 1px solid rgba(124,109,250,0.2); }
+  .status-later { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  .phase-body {
+    border-top: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    display: none;
+  }
+
+  .phase-body.open { display: block; }
+
+  .phase-body ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .phase-body li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .phase-body li::before {
+    content: '→';
+    color: var(--accent2);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .phase-body li strong { color: var(--text); font-weight: 500; }
+
+  /* ── FILE TREE ── */
+  .file-tree {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 2;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+
+  .ft-dir { color: var(--accent2); }
+  .ft-file { color: var(--text); }
+  .ft-comment { color: var(--muted); font-size: 11px; }
+  .ft-done { color: var(--accent); }
+  .ft-todo { color: var(--muted); }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 10px; right: 14px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .kw { color: var(--accent2); }
+  .str { color: var(--accent); }
+  .cm { color: var(--muted); font-style: italic; }
+  .num { color: var(--accent4); }
+
+  /* ── CONCEPT BOXES ── */
+  .concept-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    .concept-row { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: 1fr; }
+  }
+
+  .concept-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .concept-box h4 {
+    font-family: var(--head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .concept-box p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* ── CHEVRON ── */
+  .chevron {
+    width: 20px; height: 20px;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .phase-header.open .chevron { transform: rotate(90deg); }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+  }
+
+  .footer span { color: var(--accent); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--head);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* fade-in on load */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * {
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero > *:nth-child(5) { animation-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Sentio</div>
+  <ul class="nav-links">
+    <li><a href="#what">What</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#tech">Tech stack</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#structure">Files</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="tag">Project Guide · Beginner Friendly</div>
+  <h1><span>Sentio</span><br>explained.</h1>
+  <p class="hero-sub">
+    A complete walkthrough of what we designed, why every piece exists,
+    and <strong>exactly what to build next.</strong>
+  </p>
+  <div class="scroll-hint">↓ scroll</div>
+</section>
+
+<!-- WHAT IS SENTIO -->
+<section class="section" id="what">
+  <div class="container">
+    <div class="section-label">01 — The Big Idea</div>
+    <h2>What is Sentio?</h2>
+    <p>Sentio is a <strong>real-time stock sentiment pipeline</strong>. Every 30 seconds it reads financial news headlines, figures out whether the news is positive or negative, stores that score per stock, and streams it live to a browser dashboard.</p>
+
+    <div class="analogy">
+      Imagine you hired someone to read every financial news article about TSLA, AAPL, and NVDA all day. After each article they text you: "TSLA — positive (0.72)" or "AAPL — negative (-0.45)". Sentio does exactly that, but fully automated, in real time, for free.
+    </div>
+
+    <p>The score comes from <strong>VADER</strong> — a sentiment model that runs entirely on your machine. No API key, no cost. It reads a headline like <em>"Tesla recalls 200,000 vehicles"</em> and outputs <code style="color:var(--accent3);font-family:var(--mono)">-0.68</code>. A headline like <em>"NVIDIA smashes earnings expectations"</em> gets <code style="color:var(--accent);font-family:var(--mono)">+0.91</code>.</p>
+
+    <div class="concept-row">
+      <div class="concept-box">
+        <h4>📈 What it shows</h4>
+        <p>A live dashboard with a sentiment score per ticker, a rolling chart, and the last 20 headlines that drove the score.</p>
+      </div>
+      <div class="concept-box">
+        <h4>🏆 Why it's impressive</h4>
+        <p>It's reactive end-to-end — WebFlux + Kafka + SSE. No other open-source tool in this space is built this way.</p>
+      </div>
+      <div class="concept-box">
+        <h4>💰 Cost to run</h4>
+        <p>Zero. Free RSS feeds, free Yahoo Finance API, VADER runs locally, Docker for Kafka + Redis.</p>
+      </div>
+      <div class="concept-box">
+        <h4>🎯 Resume value</h4>
+        <p>Covers reactive programming, message brokers, NLP, Redis, SSE streaming — 5 advanced topics in one project.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-label">02 — The Pipeline</div>
+    <h2>How data flows through Sentio</h2>
+    <p>Sentio has 6 layers. Each one does one job and passes data to the next. Think of it like an assembly line.</p>
+
+    <div class="pipeline">
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:var(--accent)">📰</div>
+          <div class="pipe-connector"></div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 1 — RSS Scraper <span class="pipe-badge" style="background:rgba(0,255,135,0.1);color:var(--accent)">RssScraper.java</span></h3>
+          <p>Every 30 seconds, fetches Yahoo Finance RSS feeds for AAPL, TSLA, NVDA, MSFT. Uses a library called <strong>Rome</strong> to parse the XML. Each article becomes a <code style="font-family:var(--mono);color:var(--accent2)">NewsArticle</code> object with a title, description, and timestamp. Publishes it to Kafka.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(124,109,250,0.1);border:1px solid rgba(124,109,250,0.3);color:var(--accent2)">📬</div>
+          <div class="pipe-connector"></div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 2 — Kafka <span class="pipe-badge" style="background:rgba(124,109,250,0.1);color:var(--accent2)">KafkaTopicConfig.java</span></h3>
+          <p>Think of Kafka as a <strong>post office with 3 mailboxes</strong>: <code style="font-family:var(--mono);color:var(--accent2)">raw-news</code>, <code style="font-family:var(--mono);color:var(--accent2)">price-tick</code>, and <code style="font-family:var(--mono);color:var(--accent2)">sentiment-out</code>. The scraper drops articles in <code style="font-family:var(--mono);color:var(--accent2)">raw-news</code>. The processor picks them up. If the processor is slow, articles queue up safely — nothing gets lost.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(255,217,61,0.1);border:1px solid rgba(255,217,61,0.3);color:var(--accent4)">🧠</div>
+          <div class="pipe-connector"></div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 3 — VADER Processor <span class="pipe-badge" style="background:rgba(255,217,61,0.1);color:var(--accent4)">SentimentProcessorService.java</span></h3>
+          <p>Reads articles from Kafka. For each one, runs VADER sentiment analysis on the headline. VADER returns a <strong>compound score between -1.0 and +1.0</strong>. Above 0.05 = positive, below -0.05 = negative, in between = neutral. Takes ~2ms per headline. Results go to Redis and Kafka <code style="font-family:var(--mono);color:var(--accent4)">sentiment-out</code>.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);color:var(--accent5)">🗄️</div>
+          <div class="pipe-connector"></div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 4 — Redis Storage <span class="pipe-badge" style="background:rgba(78,205,196,0.1);color:var(--accent5)">SentimentAggregator.java</span></h3>
+          <p>Redis is a <strong>super-fast in-memory database</strong>. We store two things per ticker: a list of the last 50 scored headlines, and a sorted set of scores over the last 24 hours. When the dashboard asks "what's TSLA's mood right now?", Redis answers in under 1ms.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:var(--accent3)">📡</div>
+          <div class="pipe-connector"></div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 5 — SSE Endpoint <span class="pipe-badge" style="background:rgba(255,107,107,0.1);color:var(--accent3)">SentimentStreamController.java</span></h3>
+          <p>SSE = <strong>Server-Sent Events</strong>. The browser connects once to <code style="font-family:var(--mono);color:var(--accent3)">/api/sentiment/stream/AAPL</code> and the server pushes new scores automatically whenever they arrive. No polling. Also sends a heartbeat every 15s so the connection stays alive through proxies.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-line">
+          <div class="pipe-dot" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:var(--accent)">🖥️</div>
+        </div>
+        <div class="pipe-content">
+          <h3>Layer 6 — Dashboard <span class="pipe-badge" style="background:rgba(0,255,135,0.1);color:var(--accent)">index.html</span></h3>
+          <p>Vanilla JS + Chart.js. Uses the browser's built-in <code style="font-family:var(--mono);color:var(--accent)">EventSource</code> API to connect to the SSE endpoint. Updates a live chart and headline feed every time a new sentiment event arrives. No React, no framework needed.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="section" id="tech">
+  <div class="container">
+    <div class="section-label">03 — Tech Stack</div>
+    <h2>Every technology, explained simply</h2>
+    <p>Here's what each tool is, what it does in Sentio, and why we picked it over alternatives.</p>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(0,255,135,0.1)">🌿</div>
+          <h4>Spring WebFlux</h4>
+        </div>
+        <p>The reactive backbone of the whole backend. Unlike regular Spring MVC which blocks a thread per request, WebFlux handles thousands of connections with very few threads. Essential for SSE streaming.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(124,109,250,0.1)">📮</div>
+          <h4>Apache Kafka</h4>
+        </div>
+        <p>A message broker — sits between the scraper and the processor so they're completely independent. If the processor crashes, Kafka holds the messages until it restarts. Industry standard at every major fintech.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(255,107,107,0.1)">⚡</div>
+          <h4>Redis</h4>
+        </div>
+        <p>In-memory key-value store. We use it to cache the last 50 headlines per ticker and the rolling 24h score history. Reads take under 1ms, making the dashboard feel instant.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(255,217,61,0.1)">🧠</div>
+          <h4>VADER Sentiment</h4>
+        </div>
+        <p>A rule-based NLP model specifically built for short social/news text. Runs fully locally in the JVM — no server calls, no API key, no cost. Scores a headline in ~2ms.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(78,205,196,0.1)">🔗</div>
+          <h4>Rome RSS Parser</h4>
+        </div>
+        <p>Java library that parses RSS/Atom feeds. Yahoo Finance exposes free RSS feeds per ticker — no API key needed. Rome turns the XML into Java objects we can work with.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(0,255,135,0.1)">📡</div>
+          <h4>SSE (Server-Sent Events)</h4>
+        </div>
+        <p>A browser protocol for one-way server→client streaming. Simpler than WebSockets for this use case. The browser's built-in EventSource API handles reconnection automatically.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(124,109,250,0.1)">🐳</div>
+          <h4>Docker Compose</h4>
+        </div>
+        <p>Runs Kafka and Redis locally with one command: <code style="font-family:var(--mono);color:var(--accent2)">docker-compose up -d</code>. No manual installation. Same config works on Railway for deployment.</p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tech-card-top">
+          <div class="tech-icon" style="background:rgba(255,107,107,0.1)">📊</div>
+          <h4>Chart.js</h4>
+        </div>
+        <p>Frontend charting library. We use it to draw the live sentiment score timeline. Loaded via CDN — no npm, no build step needed for the dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="section" id="roadmap">
+  <div class="container">
+    <div class="section-label">04 — Build Roadmap</div>
+    <h2>What we designed vs what's left</h2>
+    <p>Click each phase to see the details. We've fully designed everything — now it's time to code it in order.</p>
+
+    <div class="roadmap">
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 01</span>
+          <span class="phase-title">✅ Project setup + configuration</span>
+          <span class="phase-status status-done">DESIGNED</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>IntelliJ Spring Initializr with <strong>WebFlux, Kafka, Redis Reactive, Lombok</strong></li>
+            <li>Add manual deps: <strong>Rome, Reactor-Kafka, VADER</strong> to pom.xml</li>
+            <li>Set up <strong>application.yml</strong> with Kafka, Redis, ticker list config</li>
+            <li>Create <strong>package structure</strong>: config, model, scraper, processor, stream, controller</li>
+            <li>Start <strong>Docker Compose</strong> to run Kafka + Redis locally</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 02</span>
+          <span class="phase-title">⬜ Model classes (DTOs)</span>
+          <span class="phase-status status-next">BUILD FIRST</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Create <strong>NewsArticle.java</strong> — title, description, publishedAt, sourceUrl</li>
+            <li>Create <strong>SentimentResult.java</strong> — ticker, headline, compound score, label, timestamp</li>
+            <li>Create <strong>PriceTick.java</strong> — ticker, price, change, changePercent, volume, fetchedAt</li>
+            <li>Create <strong>SentimentSnapshot.java</strong> — for the /summary endpoint response</li>
+            <li>Create <strong>SentimentLabel.java</strong> enum — POSITIVE, NEGATIVE, NEUTRAL</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 03</span>
+          <span class="phase-title">⬜ Kafka config + producer service</span>
+          <span class="phase-status status-next">BUILD SECOND</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Create <strong>KafkaTopicConfig.java</strong> — define raw-news, price-tick, sentiment-out topics</li>
+            <li>Create <strong>KafkaProducerService.java</strong> — wraps ReactiveKafkaProducerTemplate, serializes to JSON</li>
+            <li>Create <strong>KafkaConsumerConfig.java</strong> — consumer group, deserializers</li>
+            <li>Test: verify topics are created in Kafka when the app starts</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 04</span>
+          <span class="phase-title">⬜ RSS Scraper + Price Poller</span>
+          <span class="phase-status status-next">BUILD THIRD</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Create <strong>RssScraper.java</strong> — Flux.interval, Rome feed parse, publish to raw-news</li>
+            <li>Create <strong>YahooPricePoller.java</strong> — WebClient to query1.finance.yahoo.com, publish to price-tick</li>
+            <li>Create <strong>PriceStore.java</strong> — save/get latest PriceTick in Redis with 5min TTL</li>
+            <li>Test: check Kafka raw-news topic receives messages using Kafka console consumer</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 05</span>
+          <span class="phase-title">⬜ VADER Sentiment Processor</span>
+          <span class="phase-status status-next">BUILD FOURTH</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Create <strong>SentimentProcessorService.java</strong> — Kafka consumer, runs VADER, emits SentimentResult</li>
+            <li>Create <strong>SentimentAggregator.java</strong> — saves to Redis list + sorted set, pruning logic</li>
+            <li>Implement <strong>buildSnapshot()</strong> — computes rolling average, trend, recent headlines</li>
+            <li>Test: log compound scores to console, verify they make sense for the headlines</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 06</span>
+          <span class="phase-title">⬜ SSE Streaming Endpoint</span>
+          <span class="phase-status status-next">BUILD FIFTH</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Create <strong>SentimentStreamService.java</strong> — shared multicasted Flux per ticker, dedup logic</li>
+            <li>Create <strong>SentimentStreamController.java</strong> — /stream/{ticker}, /snapshot, /summary endpoints</li>
+            <li>Create <strong>PriceController.java</strong> — /api/price/{ticker} and /full combined endpoint</li>
+            <li>Create <strong>CorsConfig.java</strong> — allow localhost:3000 for EventSource</li>
+            <li>Test: open browser, hit /stream/AAPL, watch events appear</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 07</span>
+          <span class="phase-title">⬜ Frontend Dashboard</span>
+          <span class="phase-status status-next">BUILD SIXTH</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Build <strong>index.html</strong> — ticker buttons, score display, Chart.js timeline, headline feed</li>
+            <li>Connect <strong>EventSource</strong> to /stream/{ticker} — live updates on sentiment events</li>
+            <li>Load snapshot on ticker switch for <strong>instant initial data</strong></li>
+            <li>Style with <strong>green/red color coding</strong> per sentiment label</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <span class="phase-num">PHASE 08</span>
+          <span class="phase-title">⬜ Deploy to Railway</span>
+          <span class="phase-status status-later">LATER</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="phase-body">
+          <ul>
+            <li>Write <strong>Dockerfile</strong> — same pattern as Riffly</li>
+            <li>Write <strong>railway.toml</strong> — start command, health check</li>
+            <li>Set up <strong>Railway environment variables</strong> for Kafka and Redis URLs</li>
+            <li>Write <strong>README.md</strong> with architecture diagram for GitHub</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FILE STRUCTURE -->
+<section class="section" id="structure">
+  <div class="container">
+    <div class="section-label">05 — File Structure</div>
+    <h2>Every file you'll create</h2>
+    <p>Green = designed and ready to write. Gray = coming in later phases.</p>
+
+    <div class="file-tree">
+<span class="ft-dir">sentio/</span>
+├── <span class="ft-dir">src/main/java/com/sentio/</span>
+│   ├── <span class="ft-dir">config/</span>
+│   │   ├── <span class="ft-done">✓ KafkaTopicConfig.java</span>         <span class="ft-comment">← Phase 3</span>
+│   │   ├── <span class="ft-done">✓ KafkaConsumerConfig.java</span>      <span class="ft-comment">← Phase 3</span>
+│   │   └── <span class="ft-done">✓ CorsConfig.java</span>               <span class="ft-comment">← Phase 6</span>
+│   ├── <span class="ft-dir">model/</span>
+│   │   ├── <span class="ft-done">✓ NewsArticle.java</span>              <span class="ft-comment">← Phase 2</span>
+│   │   ├── <span class="ft-done">✓ SentimentResult.java</span>          <span class="ft-comment">← Phase 2</span>
+│   │   ├── <span class="ft-done">✓ SentimentSnapshot.java</span>        <span class="ft-comment">← Phase 2</span>
+│   │   ├── <span class="ft-done">✓ PriceTick.java</span>                <span class="ft-comment">← Phase 2</span>
+│   │   └── <span class="ft-done">✓ SentimentLabel.java</span>           <span class="ft-comment">← Phase 2 (enum)</span>
+│   ├── <span class="ft-dir">scraper/</span>
+│   │   ├── <span class="ft-done">✓ RssScraper.java</span>               <span class="ft-comment">← Phase 4</span>
+│   │   └── <span class="ft-done">✓ YahooPricePoller.java</span>         <span class="ft-comment">← Phase 4</span>
+│   ├── <span class="ft-dir">processor/</span>
+│   │   ├── <span class="ft-done">✓ SentimentProcessorService.java</span> <span class="ft-comment">← Phase 5</span>
+│   │   └── <span class="ft-done">✓ SentimentAggregator.java</span>      <span class="ft-comment">← Phase 5</span>
+│   ├── <span class="ft-dir">stream/</span>
+│   │   └── <span class="ft-done">✓ SentimentStreamService.java</span>   <span class="ft-comment">← Phase 6</span>
+│   ├── <span class="ft-dir">controller/</span>
+│   │   ├── <span class="ft-done">✓ SentimentStreamController.java</span> <span class="ft-comment">← Phase 6</span>
+│   │   └── <span class="ft-done">✓ PriceController.java</span>          <span class="ft-comment">← Phase 6</span>
+│   └── <span class="ft-done">✓ SentioApplication.java</span>            <span class="ft-comment">← auto-generated</span>
+│
+├── <span class="ft-dir">src/main/resources/</span>
+│   └── <span class="ft-done">✓ application.yml</span>                   <span class="ft-comment">← Phase 1 ✅</span>
+│
+├── <span class="ft-dir">src/main/resources/static/</span>
+│   └── <span class="ft-done">✓ index.html</span>                        <span class="ft-comment">← Phase 7</span>
+│
+├── <span class="ft-done">✓ docker-compose.yml</span>                    <span class="ft-comment">← Phase 1 ✅</span>
+├── <span class="ft-todo">○ Dockerfile</span>                            <span class="ft-comment">← Phase 8</span>
+├── <span class="ft-todo">○ railway.toml</span>                          <span class="ft-comment">← Phase 8</span>
+└── <span class="ft-todo">○ README.md</span>                             <span class="ft-comment">← Phase 8</span>
+    </div>
+
+    <p>Your immediate next step is <strong>Phase 2 — the model classes</strong>. They're just plain Java classes with <code style="font-family:var(--mono);color:var(--accent2)">@Data @Builder</code> from Lombok. No Spring magic yet. Start simple.</p>
+
+    <div class="code-block" data-lang="WHAT TO DO NOW">
+<span class="cm">// 1. Open IntelliJ with your Sentio project</span>
+<span class="cm">// 2. Right-click com.sentio → New Package → "model"</span>
+<span class="cm">// 3. Create SentimentLabel.java first (simplest)</span>
+
+<span class="kw">public enum</span> SentimentLabel {
+    POSITIVE, NEGATIVE, NEUTRAL
+}
+
+<span class="cm">// 4. Then create NewsArticle.java</span>
+<span class="cm">// 5. Then SentimentResult.java</span>
+<span class="cm">// 6. Then PriceTick.java</span>
+<span class="cm">// Ask Claude for the full code of each one as you go!</span>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Sentio · <span>Sense the market.</span> · Built by Harshit Saini</p>
+  <p style="margin-top:0.5rem;font-size:11px">Spring WebFlux · Kafka · Redis · VADER · SSE · Chart.js</p>
+</footer>
+
+<script>
+function togglePhase(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.phase-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.phase-header').forEach(h => h.classList.remove('open'));
+  if (!isOpen) {
+    body.classList.add('open');
+    header.classList.add('open');
+  }
+}
+// Open first phase by default
+document.querySelector('.phase-header').click();
+</script>
+</body>
+</html>
