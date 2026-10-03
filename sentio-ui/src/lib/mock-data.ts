@@ -143,16 +143,20 @@ export function generateMockWatchlistDefaults() {
 }
 
 export function generateMockKPIData() {
+  const totalBase = 12847;
+  const totalDelta = Math.floor(Math.random() * 40) - 10; // -10 to +30
+  const bullish = 38 + Math.floor(Math.random() * 10);     // 38-47
+  const bearish = 27 + Math.floor(Math.random() * 10);     // 27-36
   return {
-    totalNewsProcessed: 12847,
-    bullishPercent: 42,
-    bearishPercent: 31,
-    neutralPercent: 27,
-    avgSentiment: 0.12,
-    todayArticles: 156,
-    avgLatency: 23,
-    requestsPerSec: 847,
-    queueDepth: 12,
+    totalNewsProcessed: totalBase + totalDelta + Math.floor((Date.now() / 3000) % 200),
+    bullishPercent: bullish,
+    bearishPercent: bearish,
+    neutralPercent: 100 - bullish - bearish,
+    avgSentiment: parseFloat((Math.random() * 0.4 - 0.05).toFixed(2)),
+    todayArticles: 140 + Math.floor(Math.random() * 40),
+    avgLatency: 18 + Math.floor(Math.random() * 15),
+    requestsPerSec: 780 + Math.floor(Math.random() * 150),
+    queueDepth: 5 + Math.floor(Math.random() * 20),
   };
 }
 

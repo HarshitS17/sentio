@@ -21,15 +21,27 @@ const STATUS_ITEMS = [
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
+  const [kpi, setKpi] = useState(() => generateMockKPIData());
+  const [chartData, setChartData] = useState(() => generateMockDashboardChartData());
+  const [alerts, setAlerts] = useState(() => generateMockAlerts().slice(0, 4));
+  const stocks = useMemo(() => generateMockStockData().slice(0, 8), []);
+  const [tick, setTick] = useState(0);
+
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(t);
   }, []);
 
-  const kpi = generateMockKPIData();
-  const chartData = generateMockDashboardChartData();
-  const alerts = generateMockAlerts().slice(0, 4);
-  const stocks = useMemo(() => generateMockStockData().slice(0, 8), []);
+  // Real-time data polling every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setKpi(generateMockKPIData());
+      setChartData(generateMockDashboardChartData());
+      setAlerts(generateMockAlerts().slice(0, 4));
+      setTick(prev => prev + 1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -68,6 +80,13 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Grid */}
+      <div className="flex items-center gap-2 mb-1">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3B82F6] opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3B82F6]" />
+        </span>
+        <span className="text-xs text-[#94A3B8]">Live · updates every 3s</span>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           { label: 'Total News', value: kpi.totalNewsProcessed, icon: Newspaper, color: 'text-[#3B82F6]' },

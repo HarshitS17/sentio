@@ -1,6 +1,6 @@
 'use client';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type AnimatedNumberProps = {
   value: number;
@@ -11,17 +11,21 @@ type AnimatedNumberProps = {
 
 export default function AnimatedNumber({
   value,
-  duration = 1.2,
+  duration = 0.8,
   locale,
   maximumFractionDigits = 0,
 }: AnimatedNumberProps) {
-  const motionValue = useMotionValue(0);
+  const motionValue = useMotionValue(value);
+  const isFirstRender = useRef(true);
   const display = useTransform(motionValue, (latest) =>
     Math.round(latest).toLocaleString(locale, { maximumFractionDigits })
   );
 
   useEffect(() => {
-    motionValue.set(0);
+    if (isFirstRender.current) {
+      motionValue.set(0);
+      isFirstRender.current = false;
+    }
     const animation = animate(motionValue, value, { duration, ease: 'easeOut' });
     return animation.stop;
   }, [value, duration, motionValue]);
