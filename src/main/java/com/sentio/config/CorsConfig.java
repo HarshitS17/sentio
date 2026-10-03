@@ -1,28 +1,36 @@
 package com.sentio.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * Phase 6 — allows the browser to call /api/** from a different origin.
+ * Allows the browser to call /api/** from a different origin.
  *
- * The Phase 7 dashboard (index.html) will normally be served as a static
- * resource from this same Spring Boot app, in which case CORS isn't even
- * needed — same-origin requests aren't blocked by the browser. This config
- * matters during local frontend development, e.g. running the dashboard
- * off a separate dev server (Vite, live-server, etc.) on localhost:3000
- * while the backend runs on localhost:8080.
+ * During local dev the Next.js frontend runs on localhost:3000.
+ * When deployed to Vercel the origin is a vercel.app domain.
+ *
+ * Allowed origins are controlled via the CORS_ALLOWED_ORIGINS env var
+ * (comma-separated). Falls back to localhost:3000 for local development.
+ *
+ * Example (set in your shell before running the app, or in application.yaml):
+ *   CORS_ALLOWED_ORIGINS=http://localhost:3000,https://sentio-ui.vercel.app
  */
 @Configuration
 public class CorsConfig implements WebFluxConfigurer {
 
+    @Value("${cors.allowed-origins:http://localhost:3000,http://127.0.0.1:3000}")
+    private String[] allowedOrigins;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3000", "http://127.0.0.1:3000")
-                .allowedMethods("GET")
+                .allowedOriginPatterns("*")   // allows any origin incl. Vercel previews
+                .allowedOrigins(allowedOrigins)
+                .allowedMethods("GET", "OPTIONS")
                 .allowedHeaders("*")
+                .exposedHeaders("Content-Type", "Cache-Control")
                 .maxAge(3600);
     }
 }

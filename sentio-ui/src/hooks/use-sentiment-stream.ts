@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import type { SentimentSnapshot } from '@/types';
+import { API_BASE_URL } from '@/lib/constants';
 
 export function useSentimentStream(ticker: string | null) {
   const [data, setData] = useState<SentimentSnapshot | null>(null);
@@ -35,7 +36,7 @@ export function useSentimentStream(ticker: string | null) {
       }
 
       try {
-        const url = `http://localhost:8080/api/sentiment/stream/${ticker}`;
+        const url = `${API_BASE_URL}/api/sentiment/stream/${ticker}`;
         const eventSource = new EventSource(url);
         eventSourceRef.current = eventSource;
 

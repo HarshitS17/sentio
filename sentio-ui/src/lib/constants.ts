@@ -53,7 +53,8 @@ export const TICKER_INFO: Record<string, { name: string; color: string; sector: 
   V: { name: 'Visa Inc.', color: '#1A1F71', sector: 'Payments', marketCap: '$530B' },
 };
 
-export const API_BASE_URL = 'http://localhost:8080';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 export const API_ENDPOINTS = {
   price: (ticker: string) => `${API_BASE_URL}/api/price/${ticker}`,
